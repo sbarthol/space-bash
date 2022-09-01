@@ -35,6 +35,8 @@ struct PlayMode : Mode {
 
 	PPU466 ppu;
 
+	private:
+
 	// reading the PNG file and loading it to the PPU memory
 
 	int width, height;
@@ -42,8 +44,8 @@ struct PlayMode : Mode {
   png_byte bit_depth;
   png_bytep *row_pointers;
 
-  void read_png_file(const char *filename);
-  void load_png_tu_ppu(PPU466 ppu);
+  void read_png_file(std::string filename);
+  void load_png_tu_ppu();
 
 	// computed once
 
