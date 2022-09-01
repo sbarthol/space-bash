@@ -1,10 +1,12 @@
-#include "PPU466.hpp"
-#include "Mode.hpp"
+#include <png.h>
 
-#include <glm/glm.hpp>
-
-#include <vector>
 #include <deque>
+#include <glm/glm.hpp>
+#include <string>
+#include <vector>
+
+#include "Mode.hpp"
+#include "PPU466.hpp"
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -32,4 +34,14 @@ struct PlayMode : Mode {
 	//----- drawing handled by PPU466 -----
 
 	PPU466 ppu;
+
+	// reading the PNG file and loading it to the PPU memory
+
+	int width, height;
+  png_byte color_type;
+  png_byte bit_depth;
+  png_bytep *row_pointers;
+
+  void read_png_file(const char *filename);
+  void load_png_tu_ppu(PPU466 ppu);
 };
