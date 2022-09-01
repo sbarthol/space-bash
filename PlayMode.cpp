@@ -133,7 +133,9 @@ void PlayMode::load_png_tu_ppu() {
           png_bytep px = &(row[x * 4]);
 
           glm::u8vec4 color(px[0], px[1], px[2], px[3]);
-          current_palette.push_back(color);
+          if(std::find(current_palette.begin(), current_palette.end(), color) == current_palette.end()){
+						current_palette.push_back(color);
+					}
         }
       }
 
