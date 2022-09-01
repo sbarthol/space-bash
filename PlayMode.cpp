@@ -12,7 +12,8 @@
 #include "data_path.hpp"
 
 PlayMode::PlayMode() {
-	read_png_file(data_path("assets.png"));
+	
+	read_png_file(data_path("../assets.png"));
 	load_png_tu_ppu();
 
 	// Todo: set background to something
