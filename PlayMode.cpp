@@ -197,15 +197,11 @@ void PlayMode::load_png_tu_ppu() {
 
   ppu.tile_table = tile_table;
   for (uint32_t i = 0; i < palette_table.size(); i++) {
-    if (palette_table.size() < i) {
-      PPU466::Palette palette;
-      std::vector<glm::u8vec4> palette_vector(palette_table[i].begin(),
-                                              palette_table[i].end());
-      for (uint32_t j = 0; j < palette_vector.size(); j++) {
-        palette[j] = palette_vector[j];
-      }
-      ppu.palette_table[i] = palette;
+    PPU466::Palette palette;
+    for (uint32_t j = 0; j < palette_table[i].size(); j++) {
+      palette[j] = palette_table[i][j];
     }
+    ppu.palette_table[i] = palette;
   }
 
   // Todo: free row_pointers here
