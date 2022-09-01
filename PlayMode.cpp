@@ -15,6 +15,9 @@ PlayMode::PlayMode() {
 	
 	read_png_file(data_path("../assets.png"));
 	load_png_tu_ppu();
+	for(uint32_t i = 0;i<PPU466::BackgroundWidth*PPU466::BackgroundHeight;i++){
+		ppu.background[i]=255;
+	}
 
 	// Todo: set background to something
 }
