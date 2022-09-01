@@ -14,6 +14,8 @@
 PlayMode::PlayMode() {
 	read_png_file(data_path("assets.png"));
 	load_png_tu_ppu();
+
+	// Todo: set background to something
 }
 
 PlayMode::~PlayMode() {
@@ -123,12 +125,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 }
 
 void PlayMode::load_png_tu_ppu() {
-  std::vector<std::set<glm::u8vec4>> palette_table;
+  std::vector<std::vector<glm::u8vec4>> palette_table;
   std::array<PPU466::Tile, 16 * 16> tile_table;
 
   for (uint32_t i = 0; i < 16; i++) {
     for (uint32_t j = 0; j < 16; j++) {
-      std::set<glm::u8vec4> current_palette;
+      std::vector<glm::u8vec4> current_palette;
 
       for (uint32_t y = i * 8; y < i * 8 + 8; i++) {
         png_bytep row = row_pointers[y];
@@ -136,13 +138,15 @@ void PlayMode::load_png_tu_ppu() {
           png_bytep px = &(row[x * 4]);
 
           glm::u8vec4 color(px[0], px[1], px[2], px[3]);
-          current_palette.insert(color);
+          current_palette.push_back(color);
         }
       }
 
       if (current_palette.size() > 4) {
         throw std::runtime_error("Tile has more than 4 colors");
       }
+
+			sort(current_palette.begin(), current_palette.end());
 
       uint32_t palette_idx = -1;
       for (uint32_t k = 0; k < palette_table.size(); k++) {
@@ -175,9 +179,9 @@ void PlayMode::load_png_tu_ppu() {
 
           glm::u8vec4 color(px[0], px[1], px[2], px[3]);
 
-          uint32_t color_idx = std::distance(current_palette.begin(),
-                                             current_palette.find(color));
-          assert(color_idx < 4);
+					auto it = std::find(current_palette.begin(), current_palette.end(), color);
+					assert(it != current_palette.end());
+					uint32_t color_idx = it - current_palette.begin();
 
           current_tile.bit0[x - j * 8] |= (color_idx & 1) << (7 - y + i * 8);
           current_tile.bit1[x - j * 8] |= (color_idx >> 1) << (7 - y + i * 8);
