@@ -127,9 +127,9 @@ void PlayMode::load_png_tu_ppu() {
     for (uint32_t j = 0; j < 16; j++) {
       std::vector<glm::u8vec4> current_palette;
 
-      for (uint32_t y = i * 8; y < i * 8 + 8; i++) {
+      for (uint32_t y = i * 8; y < i * 8 + 8; y++) {
         png_bytep row = row_pointers[y];
-        for (int x = j * 8; x < j * 8 + 8; j++) {
+        for (int x = j * 8; x < j * 8 + 8; x++) {
           png_bytep px = &(row[x * 4]);
 
           glm::u8vec4 color(px[0], px[1], px[2], px[3]);
@@ -172,9 +172,9 @@ void PlayMode::load_png_tu_ppu() {
       current_palette = palette_table[palette_idx];
       PPU466::Tile current_tile;
 
-      for (uint32_t y = i * 8; y < i * 8 + 8; i++) {
+      for (uint32_t y = i * 8; y < i * 8 + 8; y++) {
         png_bytep row = row_pointers[y];
-        for (int x = j * 8; x < j * 8 + 8; j++) {
+        for (int x = j * 8; x < j * 8 + 8; x++) {
           png_bytep px = &(row[x * 4]);
 
           glm::u8vec4 color(px[0], px[1], px[2], px[3]);
