@@ -144,8 +144,8 @@ void PlayMode::load_png_tu_ppu() {
       }
 
       auto lt = [](glm::u8vec4 a, glm::u8vec4 b) {
-        return a[0] | (a[1] << 8) | (a[2] << 16) | (a[3] << 24) < b[0] |
-               (b[1] << 8) | (b[2] << 16) | (b[3] << 24);
+        return (a[0] | (a[1] << 8) | (a[2] << 16) | (a[3] << 24)) < (b[0] |
+               (b[1] << 8) | (b[2] << 16) | (b[3] << 24));
       };
 
       sort(current_palette.begin(), current_palette.end(), lt);
