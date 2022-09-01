@@ -7,3 +7,5 @@ dist/SDL2.dll
 dist/game
 dist/game.exe
 maek-cache.json
+.DS_Store
+.vscode/
