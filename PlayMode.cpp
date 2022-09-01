@@ -171,27 +171,37 @@ void PlayMode::load_png_tu_ppu() {
         throw std::runtime_error("Need more than 8 palettes");
       }
 
-      current_palette = palette_table[palette_idx];
+			tile_idx_to_palette_idx[i * 16 + j] = palette_idx;
+    }
+  }
+
+  for (uint32_t i = 0; i < 16; i++) {
+    for (uint32_t j = 0; j < 16; j++) {
+      std::vector<glm::u8vec4> current_palette =
+          palette_table[tile_idx_to_palette_idx[i * 16 + j]];
       PPU466::Tile current_tile;
+			current_tile.bit0.fill(0);
+			current_tile.bit1.fill(0);
 
       for (uint32_t y = i * 8; y < i * 8 + 8; y++) {
         png_bytep row = row_pointers[y];
-        for (int x = j * 8; x < j * 8 + 8; x++) {
+        for (uint32_t x = j * 8; x < j * 8 + 8; x++) {
+					
           png_bytep px = &(row[x * 4]);
 
           glm::u8vec4 color(px[0], px[1], px[2], px[3]);
 
-					auto it = std::find(current_palette.begin(), current_palette.end(), color);
-					assert(it != current_palette.end());
-					uint32_t color_idx = it - current_palette.begin();
+          auto it =
+              std::find(current_palette.begin(), current_palette.end(), color);
+          assert(it != current_palette.end());
+          uint32_t color_idx = it - current_palette.begin();
 
-          current_tile.bit0[x - j * 8] |= (color_idx & 1) << (7 - y + i * 8);
-          current_tile.bit1[x - j * 8] |= (color_idx >> 1) << (7 - y + i * 8);
+					current_tile.bit0[7 - y + i * 8] |= (color_idx & 1) << (x - j * 8);
+          current_tile.bit1[7 - y + i * 8] |= (color_idx >> 1) << (x - j * 8);
+          
         }
       }
-
       tile_table[i + 16 * j] = current_tile;
-      tile_idx_to_palette_idx[i * 16 + j] = palette_idx;
     }
   }
 
