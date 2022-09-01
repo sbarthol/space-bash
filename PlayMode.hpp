@@ -44,4 +44,8 @@ struct PlayMode : Mode {
 
   void read_png_file(const char *filename);
   void load_png_tu_ppu(PPU466 ppu);
+
+	// computed once
+
+	std::array<uint32_t, 16*16> tile_idx_to_palette_idx;
 };

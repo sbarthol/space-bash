@@ -1,12 +1,14 @@
 #include "PlayMode.hpp"
 
-//for the GL_ERRORS() macro:
+// for the GL_ERRORS() macro:
 #include "gl_errors.hpp"
 
-//for glm::value_ptr() :
+// for glm::value_ptr() :
 #include <glm/gtc/type_ptr.hpp>
-
+#include <iterator>
 #include <random>
+#include <set>
+#include <unordered_map>
 
 PlayMode::PlayMode() {
 	//TODO:
@@ -211,15 +213,82 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 }
 
 void PlayMode::load_png_tu_ppu(PPU466 ppu) {
-  using namespace std;
-  cout << "width = " << width << ", height = " << height << endl;
-  for (int y = 0; y < height; y++) {
-    png_bytep row = row_pointers[y];
-    for (int x = 0; x < width; x++) {
-      png_bytep px = &(row[x * 4]);
-      // Do something awesome for each pixel here...
-      printf("%4d, %4d = RGBA(%3d, %3d, %3d, %3d)\n", x, y, px[0], px[1], px[2],
-             px[3]);
+  std::vector<std::set<glm::u8vec4>> palette_table;
+  std::array<PPU466::Tile, 16 * 16> tile_table;
+
+  for (uint32_t i = 0; i < 16; i++) {
+    for (uint32_t j = 0; j < 16; j++) {
+      std::set<glm::u8vec4> current_palette;
+
+      for (uint32_t y = i * 8; y < i * 8 + 8; i++) {
+        png_bytep row = row_pointers[y];
+        for (int x = j * 8; x < j * 8 + 8; j++) {
+          png_bytep px = &(row[x * 4]);
+
+          glm::u8vec4 color(px[0], px[1], px[2], px[3]);
+          current_palette.insert(color);
+        }
+      }
+
+      if (current_palette.size() > 4) {
+        throw std::runtime_error("Tile has more than 4 colors");
+      }
+
+      uint32_t palette_idx = -1;
+      for (uint32_t k = 0; k < palette_table.size(); k++) {
+        if (std::includes(palette_table[k].begin(), palette_table[k].end(),
+                          current_palette.begin(), current_palette.end())) {
+          palette_idx = k;
+        } else if (std::includes(current_palette.begin(), current_palette.end(),
+                                 palette_table[k].begin(),
+                                 palette_table[k].end())) {
+          palette_table[k] = current_palette;
+          palette_idx = k;
+        }
+      }
+      if (palette_idx == -1) {
+        palette_idx = palette_table.size();
+        palette_table.push_back(current_palette);
+      }
+
+      if (palette_table.size() > 8) {
+        throw std::runtime_error("Need more than 8 palettes");
+      }
+
+      current_palette = palette_table[palette_idx];
+      PPU466::Tile current_tile;
+
+      for (uint32_t y = i * 8; y < i * 8 + 8; i++) {
+        png_bytep row = row_pointers[y];
+        for (int x = j * 8; x < j * 8 + 8; j++) {
+          png_bytep px = &(row[x * 4]);
+
+          glm::u8vec4 color(px[0], px[1], px[2], px[3]);
+
+          uint32_t color_idx = std::distance(current_palette.begin(),
+                                             current_palette.find(color));
+          assert(color_idx < 4);
+
+          current_tile.bit0[x - j * 8] |= (color_idx & 1) << (7 - y + i * 8);
+          current_tile.bit1[x - j * 8] |= (color_idx >> 1) << (7 - y + i * 8);
+        }
+      }
+
+      tile_table[i + 16 * j] = current_tile;
+      tile_idx_to_palette_idx[i * 16 + j] = palette_idx;
+    }
+  }
+
+  ppu.tile_table = tile_table;
+  for (uint32_t i = 0; i < palette_table.size(); i++) {
+    if (palette_table.size() < i) {
+      PPU466::Palette palette;
+      std::vector<glm::u8vec4> palette_vector(palette_table[i].begin(),
+                                              palette_table[i].end());
+      for (uint32_t j = 0; j < palette_vector.size(); j++) {
+        palette[j] = palette_vector[j];
+      }
+      ppu.palette_table[i] = palette;
     }
   }
 
