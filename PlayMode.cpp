@@ -146,16 +146,21 @@ void PlayMode::load_png_tu_ppu() {
         throw std::runtime_error("Tile has more than 4 colors");
       }
 
-			sort(current_palette.begin(), current_palette.end());
+      auto lt = [](glm::u8vec4 a, glm::u8vec4 b) {
+        return a[0] | (a[1] << 8) | (a[2] << 16) | (a[3] << 24) < b[0] |
+               (b[1] << 8) | (b[2] << 16) | (b[3] << 24);
+      };
+
+      sort(current_palette.begin(), current_palette.end(), lt);
 
       uint32_t palette_idx = -1;
       for (uint32_t k = 0; k < palette_table.size(); k++) {
         if (std::includes(palette_table[k].begin(), palette_table[k].end(),
-                          current_palette.begin(), current_palette.end())) {
+                          current_palette.begin(), current_palette.end(), lt)) {
           palette_idx = k;
         } else if (std::includes(current_palette.begin(), current_palette.end(),
                                  palette_table[k].begin(),
-                                 palette_table[k].end())) {
+                                 palette_table[k].end(), lt)) {
           palette_table[k] = current_palette;
           palette_idx = k;
         }
