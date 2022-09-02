@@ -7,6 +7,7 @@
 
 #include "Mode.hpp"
 #include "PPU466.hpp"
+#include <list>
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -28,11 +29,20 @@ struct PlayMode : Mode {
 	//player position:
 	glm::vec2 player_at = glm::vec2(0.0f);
 
+	//projectiles
+	typedef struct {
+		uint32_t tile_idx;
+		glm::vec2 pos;
+		uint8_t dir; // {up,right,down,left} -> {0,1,2,3}
+	} Projectile;
+
+	std::list<Projectile> projectiles;
+
+	float total_elapsed = 0.0;
+
 	//----- drawing handled by PPU466 -----
 
 	PPU466 ppu;
-
-	private:
 
 	// reading the PNG file and loading it to the PPU memory
 

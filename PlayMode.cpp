@@ -79,6 +79,61 @@ void PlayMode::update(float elapsed) {
 	right.downs = 0;
 	up.downs = 0;
 	down.downs = 0;
+
+  constexpr float ProjectileSpeed = 80.0f;
+  static const int dx[] = {0,1,0,-1};
+  static const int dy[] = {1,0,-1,0};
+
+  for(Projectile &p: projectiles) {
+    p.pos.x += dx[p.dir] * ProjectileSpeed * elapsed;
+    p.pos.y += dy[p.dir] * ProjectileSpeed * elapsed;
+  }
+
+  total_elapsed += elapsed;
+  constexpr float NewProjectilePeriod = 0.3f;
+
+  if (total_elapsed > NewProjectilePeriod) {
+
+    total_elapsed -= NewProjectilePeriod;
+
+    static std::mt19937 gen32;
+    uint32_t tile_idx = gen32()%4+2;
+    uint8_t dir = gen32() % 4;
+    glm::vec2 pos;
+    switch (dir)
+    {
+    case 0:
+      pos.x = gen32() % (PPU466::ScreenWidth -7);
+      pos.y = 0;
+      break;
+    case 1:
+      pos.x = 0;
+      pos.y = gen32() % (PPU466::ScreenHeight -7);
+      break;
+    case 2:
+      pos.x = gen32() % (PPU466::ScreenWidth -7);
+      pos.y = PPU466::ScreenHeight - 8;
+      break;
+    case 3:
+      pos.x = PPU466::ScreenWidth - 8;
+      pos.y = gen32() % (PPU466::ScreenHeight -7);
+      break;
+    default:
+      break;
+    }
+    projectiles.push_front({.tile_idx = tile_idx, .pos = pos, .dir = dir});
+  }
+
+  while(projectiles.size() > 0) {
+    Projectile back = projectiles.back();
+    if(0 <= back.pos.x && back.pos.x < PPU466::ScreenWidth && 0 <= back.pos.y && back.pos.y < PPU466::ScreenHeight) {
+      break;
+    }else{
+      projectiles.pop_back();
+    }
+  }
+
+  assert(projectiles.size() <= 56);
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -125,22 +180,21 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	ppu.sprites[7].index = 1;
 	ppu.sprites[7].attributes = tile_idx_to_palette_idx[1];
 
+  uint32_t sprite_idx = 8;
 
-	//some other misc sprites:
-	for (uint32_t i = 8; i < 63; ++i) {
-		ppu.sprites[i].y = 240;
+  // projectile sprites
+  for(Projectile &p: projectiles) {
+    ppu.sprites[sprite_idx].x = p.pos.x;
+    ppu.sprites[sprite_idx].y = p.pos.y;
+    ppu.sprites[sprite_idx].index = p.tile_idx;
+    ppu.sprites[sprite_idx].attributes = tile_idx_to_palette_idx[p.tile_idx];
+    sprite_idx++;
+  }
+
+	// the rest of the sprites are not visible
+	for (; sprite_idx < 64; sprite_idx++) {
+		ppu.sprites[sprite_idx].y = 240;
 	}
-
-	/*
-	//some other misc sprites:
-	for (uint32_t i = 1; i < 63; ++i) {
-		float amt = (i + 2.0f * background_fade) / 62.0f;
-		ppu.sprites[i].x = int8_t(0.5f * PPU466::ScreenWidth + std::cos( 2.0f * M_PI * amt * 5.0f + 0.01f * player_at.x) * 0.4f * PPU466::ScreenWidth);
-		ppu.sprites[i].y = int8_t(0.5f * PPU466::ScreenHeight + std::sin( 2.0f * M_PI * amt * 3.0f + 0.01f * player_at.y) * 0.4f * PPU466::ScreenWidth);
-		ppu.sprites[i].index = 32;
-		ppu.sprites[i].attributes = 6;
-		if (i % 2) ppu.sprites[i].attributes |= 0x80; //'behind' bit
-	}*/
 
 	//--- actually draw ---
 	ppu.draw(drawable_size);
