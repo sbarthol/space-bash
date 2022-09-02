@@ -321,7 +321,10 @@ void PlayMode::load_png_tu_ppu() {
     ppu.palette_table[i] = palette;
   }
 
-  // Todo: free row_pointers here
+  for (int y = 0; y < height; y++) {
+    free(row_pointers[y]);
+  }
+  free(row_pointers);
 }
 
 void PlayMode::read_png_file(std::string filename) {
