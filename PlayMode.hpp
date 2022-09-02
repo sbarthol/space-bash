@@ -39,6 +39,7 @@ struct PlayMode : Mode {
 	std::list<Projectile> projectiles;
 
 	float total_elapsed = 0.0;
+	bool has_lost = false;
 
 	//----- drawing handled by PPU466 -----
 

@@ -68,11 +68,24 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 
 void PlayMode::update(float elapsed) {
 
+  if(has_lost){
+    return;
+  }
+
 	constexpr float PlayerSpeed = 150.0f;
 	if (left.pressed) player_at.x -= PlayerSpeed * elapsed;
 	if (right.pressed) player_at.x += PlayerSpeed * elapsed;
 	if (down.pressed) player_at.y -= PlayerSpeed * elapsed;
 	if (up.pressed) player_at.y += PlayerSpeed * elapsed;
+
+  for(const Projectile &p: projectiles) {
+    bool width_positive = std::min(player_at.x + 16, p.pos.x + 8) > std::max(player_at.x, p.pos.x);
+    bool height_positive = std::min(player_at.y + 32, p.pos.y + 8) > std::max(player_at.y, p.pos.y);
+    has_lost = width_positive && height_positive;
+    if(has_lost) {
+      break;
+    }
+  }
 
 	//reset button press counters:
 	left.downs = 0;
