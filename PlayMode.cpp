@@ -6,7 +6,6 @@
 // for glm::value_ptr() :
 #include <glm/gtc/type_ptr.hpp>
 #include <iterator>
-#include <random>
 #include <set>
 #include <unordered_map>
 #include "data_path.hpp"
@@ -16,12 +15,23 @@ PlayMode::PlayMode() {
   load_png_tu_ppu();
   for (uint32_t i = 0; i < PPU466::BackgroundWidth * PPU466::BackgroundHeight;
        i++) {
-    ppu.background[i] = 255;
+
+        uint32_t k = gen32();
+        constexpr uint32_t StarPeriod = 100;
+
+        if(k%StarPeriod == 0) {
+            ppu.background[i] = (tile_idx_to_palette_idx[18] << 8) | 18;
+        }else if(k%StarPeriod==1) {
+            ppu.background[i] = (tile_idx_to_palette_idx[19] << 8) | 19;
+        }else if(k%StarPeriod==2) {
+            ppu.background[i] = (tile_idx_to_palette_idx[20] << 8) | 20;
+        }else {
+            ppu.background[i] = 255;
+        }
+    
   }
   player_at.x = PPU466::ScreenWidth / 2 - 8;
   player_at.y = PPU466::ScreenHeight / 2 - 16;
-
-  // Todo: set background to some star tile
 }
 
 PlayMode::~PlayMode() {
@@ -109,7 +119,6 @@ void PlayMode::update(float elapsed) {
 
     total_elapsed -= NewProjectilePeriod;
 
-    static std::mt19937 gen32;
     uint32_t tile_idx = gen32()%4+2;
     uint8_t dir = gen32() % 4;
     glm::vec2 pos;
@@ -203,6 +212,10 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
     ppu.sprites[sprite_idx].attributes = tile_idx_to_palette_idx[p.tile_idx];
     sprite_idx++;
   }
+
+  //background scroll:
+	ppu.background_position.x = int32_t(-0.2f * player_at.x);
+	ppu.background_position.y = int32_t(-0.2f * player_at.y);
 
 	// the rest of the sprites are not visible
 	for (; sprite_idx < 64; sprite_idx++) {

@@ -8,6 +8,7 @@
 #include "Mode.hpp"
 #include "PPU466.hpp"
 #include <list>
+#include <random>
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -40,6 +41,7 @@ struct PlayMode : Mode {
 
 	float total_elapsed = 0.0;
 	bool has_lost = false;
+	std::mt19937 gen32;
 
 	//----- drawing handled by PPU466 -----
 
