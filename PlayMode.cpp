@@ -12,14 +12,16 @@
 #include "data_path.hpp"
 
 PlayMode::PlayMode() {
-	
-	read_png_file(data_path("../assets.png"));
-	load_png_tu_ppu();
-	for(uint32_t i = 0;i<PPU466::BackgroundWidth*PPU466::BackgroundHeight;i++){
-		ppu.background[i]=255;
-	}
+  read_png_file(data_path("../assets.png"));
+  load_png_tu_ppu();
+  for (uint32_t i = 0; i < PPU466::BackgroundWidth * PPU466::BackgroundHeight;
+       i++) {
+    ppu.background[i] = 255;
+  }
+  player_at.x = PPU466::ScreenWidth / 2 - 8;
+  player_at.y = PPU466::ScreenHeight / 2 - 16;
 
-	// Todo: set background to something
+  // Todo: set background to some star tile
 }
 
 PlayMode::~PlayMode() {
@@ -66,12 +68,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 
 void PlayMode::update(float elapsed) {
 
-	//slowly rotates through [0,1):
-	// (will be used to set background color)
-	background_fade += elapsed / 10.0f;
-	background_fade -= std::floor(background_fade);
-
-	constexpr float PlayerSpeed = 30.0f;
+	constexpr float PlayerSpeed = 150.0f;
 	if (left.pressed) player_at.x -= PlayerSpeed * elapsed;
 	if (right.pressed) player_at.x += PlayerSpeed * elapsed;
 	if (down.pressed) player_at.y -= PlayerSpeed * elapsed;
@@ -85,25 +82,52 @@ void PlayMode::update(float elapsed) {
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
-	//--- set ppu state based on game state ---
+	//--- set ppu state based on game state ---	
 
-	//background color will be some hsv-like fade:
-	ppu.background_color = glm::u8vec4(
-		std::min(255,std::max(0,int32_t(255 * 0.5f * (0.5f + std::sin( 2.0f * M_PI * (background_fade + 0.0f / 3.0f) ) ) ))),
-		std::min(255,std::max(0,int32_t(255 * 0.5f * (0.5f + std::sin( 2.0f * M_PI * (background_fade + 1.0f / 3.0f) ) ) ))),
-		std::min(255,std::max(0,int32_t(255 * 0.5f * (0.5f + std::sin( 2.0f * M_PI * (background_fade + 2.0f / 3.0f) ) ) ))),
-		0xff
-	);
-
-	//player sprite:
+	//rocket sprite:
 	ppu.sprites[0].x = int8_t(player_at.x);
 	ppu.sprites[0].y = int8_t(player_at.y);
-	ppu.sprites[0].index = 0;
-	ppu.sprites[0].attributes = tile_idx_to_palette_idx[0];
+	ppu.sprites[0].index = 48;
+	ppu.sprites[0].attributes = tile_idx_to_palette_idx[48];
+
+	ppu.sprites[1].x = int8_t(player_at.x) + 8;
+	ppu.sprites[1].y = int8_t(player_at.y);
+	ppu.sprites[1].index = 49;
+	ppu.sprites[1].attributes = tile_idx_to_palette_idx[49];
+
+	ppu.sprites[2].x = int8_t(player_at.x);
+	ppu.sprites[2].y = int8_t(player_at.y) + 8;
+	ppu.sprites[2].index = 32;
+	ppu.sprites[2].attributes = tile_idx_to_palette_idx[32];
+
+	ppu.sprites[3].x = int8_t(player_at.x) + 8;
+	ppu.sprites[3].y = int8_t(player_at.y) + 8;
+	ppu.sprites[3].index = 33;
+	ppu.sprites[3].attributes = tile_idx_to_palette_idx[33];
+
+	ppu.sprites[4].x = int8_t(player_at.x);
+	ppu.sprites[4].y = int8_t(player_at.y) + 16;
+	ppu.sprites[4].index = 16;
+	ppu.sprites[4].attributes = tile_idx_to_palette_idx[16];
+
+	ppu.sprites[5].x = int8_t(player_at.x) + 8;
+	ppu.sprites[5].y = int8_t(player_at.y) + 16;
+	ppu.sprites[5].index = 17;
+	ppu.sprites[5].attributes = tile_idx_to_palette_idx[17];
+
+	ppu.sprites[6].x = int8_t(player_at.x);
+	ppu.sprites[6].y = int8_t(player_at.y) + 24;
+	ppu.sprites[6].index = 0;
+	ppu.sprites[6].attributes = tile_idx_to_palette_idx[0];
+
+	ppu.sprites[7].x = int8_t(player_at.x) + 8;
+	ppu.sprites[7].y = int8_t(player_at.y) + 24;
+	ppu.sprites[7].index = 1;
+	ppu.sprites[7].attributes = tile_idx_to_palette_idx[1];
 
 
 	//some other misc sprites:
-	for (uint32_t i = 1; i < 63; ++i) {
+	for (uint32_t i = 8; i < 63; ++i) {
 		ppu.sprites[i].y = 240;
 	}
 
@@ -204,7 +228,7 @@ void PlayMode::load_png_tu_ppu() {
           
         }
       }
-      tile_table[i + 16 * j] = current_tile;
+      tile_table[i * 16 + j] = current_tile;
     }
   }
 
