@@ -168,51 +168,51 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
   ppu.sprites[0].x = int8_t(player_at.x);
   ppu.sprites[0].y = int8_t(player_at.y);
   ppu.sprites[0].index = 48;
-  ppu.sprites[0].attributes = tile_idx_to_palette_idx[48];
+  ppu.sprites[0].attributes = (uint8_t)tile_idx_to_palette_idx[48];
 
   ppu.sprites[1].x = int8_t(player_at.x) + 8;
   ppu.sprites[1].y = int8_t(player_at.y);
   ppu.sprites[1].index = 49;
-  ppu.sprites[1].attributes = tile_idx_to_palette_idx[49];
+  ppu.sprites[1].attributes = (uint8_t)tile_idx_to_palette_idx[49];
 
   ppu.sprites[2].x = int8_t(player_at.x);
   ppu.sprites[2].y = int8_t(player_at.y) + 8;
   ppu.sprites[2].index = 32;
-  ppu.sprites[2].attributes = tile_idx_to_palette_idx[32];
+  ppu.sprites[2].attributes = (uint8_t)tile_idx_to_palette_idx[32];
 
   ppu.sprites[3].x = int8_t(player_at.x) + 8;
   ppu.sprites[3].y = int8_t(player_at.y) + 8;
   ppu.sprites[3].index = 33;
-  ppu.sprites[3].attributes = tile_idx_to_palette_idx[33];
+  ppu.sprites[3].attributes = (uint8_t)tile_idx_to_palette_idx[33];
 
   ppu.sprites[4].x = int8_t(player_at.x);
   ppu.sprites[4].y = int8_t(player_at.y) + 16;
   ppu.sprites[4].index = 16;
-  ppu.sprites[4].attributes = tile_idx_to_palette_idx[16];
+  ppu.sprites[4].attributes = (uint8_t)tile_idx_to_palette_idx[16];
 
   ppu.sprites[5].x = int8_t(player_at.x) + 8;
   ppu.sprites[5].y = int8_t(player_at.y) + 16;
   ppu.sprites[5].index = 17;
-  ppu.sprites[5].attributes = tile_idx_to_palette_idx[17];
+  ppu.sprites[5].attributes = (uint8_t)tile_idx_to_palette_idx[17];
 
   ppu.sprites[6].x = int8_t(player_at.x);
   ppu.sprites[6].y = int8_t(player_at.y) + 24;
   ppu.sprites[6].index = 0;
-  ppu.sprites[6].attributes = tile_idx_to_palette_idx[0];
+  ppu.sprites[6].attributes = (uint8_t)tile_idx_to_palette_idx[0];
 
   ppu.sprites[7].x = int8_t(player_at.x) + 8;
   ppu.sprites[7].y = int8_t(player_at.y) + 24;
   ppu.sprites[7].index = 1;
-  ppu.sprites[7].attributes = tile_idx_to_palette_idx[1];
+  ppu.sprites[7].attributes = (uint8_t)tile_idx_to_palette_idx[1];
 
   uint32_t sprite_idx = 8;
 
   // projectile sprites
   for (Projectile &p : projectiles) {
-    ppu.sprites[sprite_idx].x = p.pos.x;
-    ppu.sprites[sprite_idx].y = p.pos.y;
-    ppu.sprites[sprite_idx].index = p.tile_idx;
-    ppu.sprites[sprite_idx].attributes = tile_idx_to_palette_idx[p.tile_idx];
+    ppu.sprites[sprite_idx].x = (uint8_t)p.pos.x;
+    ppu.sprites[sprite_idx].y = (uint8_t)p.pos.y;
+    ppu.sprites[sprite_idx].index = (uint8_t)p.tile_idx;
+    ppu.sprites[sprite_idx].attributes = (uint8_t)tile_idx_to_palette_idx[p.tile_idx];
     sprite_idx++;
   }
 
@@ -274,7 +274,7 @@ void PlayMode::load_png_tu_ppu() {
         }
       }
       if (palette_idx == -1) {
-        palette_idx = palette_table.size();
+        palette_idx = (int)palette_table.size();
         palette_table.push_back(current_palette);
       }
 
@@ -282,7 +282,7 @@ void PlayMode::load_png_tu_ppu() {
         throw std::runtime_error("Need more than 8 palettes");
       }
 
-      tile_idx_to_palette_idx[i * 16 + j] = palette_idx;
+      tile_idx_to_palette_idx[i * 16 + j] = (uint16_t)palette_idx;
     }
   }
 
@@ -304,7 +304,7 @@ void PlayMode::load_png_tu_ppu() {
           auto it =
               std::find(current_palette.begin(), current_palette.end(), color);
           assert(it != current_palette.end());
-          uint32_t color_idx = it - current_palette.begin();
+          uint32_t color_idx = (uint32_t)(it - current_palette.begin());
 
           current_tile.bit0[7 - y + i * 8] |= (color_idx & 1) << (x - j * 8);
           current_tile.bit1[7 - y + i * 8] |= (color_idx >> 1) << (x - j * 8);
