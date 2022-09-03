@@ -141,7 +141,8 @@ void PlayMode::update(float elapsed) {
       default:
         break;
     }
-    projectiles.push_front({.tile_idx = tile_idx, .pos = pos, .dir = dir});
+    Projectile p{.tile_idx = tile_idx, .pos = pos, .dir = dir};
+    projectiles.push_front(p);
   }
 
   while (projectiles.size() > 0) {

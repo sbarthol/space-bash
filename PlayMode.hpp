@@ -59,5 +59,5 @@ struct PlayMode : Mode {
 
 	// computed once
 
-	std::array<uint32_t, 16*16> tile_idx_to_palette_idx;
+	std::array<uint16_t, 16*16> tile_idx_to_palette_idx;
 };
