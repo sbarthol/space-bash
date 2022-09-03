@@ -258,7 +258,7 @@ void PlayMode::load_png_tu_ppu() {
       sort(current_palette.begin(), current_palette.end(), lt);
 
       int palette_idx = -1;
-      for (int k = 0; k < palette_table.size(); k++) {
+      for (int k = 0; k < (int)palette_table.size(); k++) {
         if (std::includes(palette_table[k].begin(), palette_table[k].end(),
                           current_palette.begin(), current_palette.end(), lt)) {
           palette_idx = k;
