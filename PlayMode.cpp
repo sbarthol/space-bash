@@ -124,7 +124,7 @@ void PlayMode::update(float elapsed) {
 
     uint32_t tile_idx = gen32() % 4 + 2;
     uint8_t dir = gen32() % 4;
-    glm::vec2 pos;
+    glm::vec2 pos(0.0f,0.0f);
     switch (dir) {
       case 0:
         pos.x = (float)(gen32() % (PPU466::ScreenWidth - 7));
@@ -320,7 +320,7 @@ void PlayMode::load_png_tu_ppu() {
 
   ppu.tile_table = tile_table;
   for (uint32_t i = 0; i < palette_table.size(); i++) {
-    PPU466::Palette palette;
+    PPU466::Palette palette{};
     for (uint32_t j = 0; j < palette_table[i].size(); j++) {
       palette[j] = palette_table[i][j];
     }
