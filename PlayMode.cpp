@@ -9,6 +9,7 @@
 #include <set>
 #include <unordered_map>
 #include "data_path.hpp"
+#include <algorithm>
 
 PlayMode::PlayMode() {
   read_png_file(data_path("../assets.png"));
@@ -234,7 +235,7 @@ void PlayMode::load_png_tu_ppu() {
 
       for (uint32_t y = i * 8; y < i * 8 + 8; y++) {
         png_bytep row = row_pointers[y];
-        for (int x = j * 8; x < j * 8 + 8; x++) {
+        for (uint32_t x = j * 8; x < j * 8 + 8; x++) {
           png_bytep px = &(row[x * 4]);
 
           glm::u8vec4 color(px[0], px[1], px[2], px[3]);
@@ -256,8 +257,8 @@ void PlayMode::load_png_tu_ppu() {
 
       sort(current_palette.begin(), current_palette.end(), lt);
 
-      uint32_t palette_idx = -1;
-      for (uint32_t k = 0; k < palette_table.size(); k++) {
+      int palette_idx = -1;
+      for (int k = 0; k < palette_table.size(); k++) {
         if (std::includes(palette_table[k].begin(), palette_table[k].end(),
                           current_palette.begin(), current_palette.end(), lt)) {
           palette_idx = k;
