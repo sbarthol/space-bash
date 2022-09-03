@@ -123,25 +123,28 @@ void PlayMode::update(float elapsed) {
     glm::vec2 pos;
     switch (dir) {
       case 0:
-        pos.x = gen32() % (PPU466::ScreenWidth - 7);
-        pos.y = 0;
+        pos.x = (float)(gen32() % (PPU466::ScreenWidth - 7));
+        pos.y = 0.0f;
         break;
       case 1:
-        pos.x = 0;
-        pos.y = gen32() % (PPU466::ScreenHeight - 7);
+        pos.x = 0.0f;
+        pos.y = (float)(gen32() % (PPU466::ScreenHeight - 7));
         break;
       case 2:
-        pos.x = gen32() % (PPU466::ScreenWidth - 7);
-        pos.y = PPU466::ScreenHeight - 8;
+        pos.x = (float)(gen32() % (PPU466::ScreenWidth - 7));
+        pos.y = (float)(PPU466::ScreenHeight - 8);
         break;
       case 3:
-        pos.x = PPU466::ScreenWidth - 8;
-        pos.y = gen32() % (PPU466::ScreenHeight - 7);
+        pos.x = (float)(PPU466::ScreenWidth - 8);
+        pos.y = (float)(gen32() % (PPU466::ScreenHeight - 7));
         break;
       default:
         break;
     }
-    Projectile p{.tile_idx = tile_idx, .pos = pos, .dir = dir};
+    Projectile p;
+    p.tile_idx = tile_idx;
+    p.pos = pos;
+    p.dir = dir;
     projectiles.push_front(p);
   }
 
